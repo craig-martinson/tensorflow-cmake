@@ -10,21 +10,15 @@ IF %ERRORLEVEL% NEQ 0 (
 	call :installcmake
 )
 
-REM Updating submodules...
-echo Updating submodules...
-chdir /d %PROJECT_ROOT% 
-
-git submodule update --init tensorflow
- 
-REM Set compiler environment
-cd "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build"
-call vcvarsall.bat amd64
-
-REM Clone tensorflow repository
+ REM Clone tensorflow repository
 echo Cloning tensorflow project...
 git clone https://github.com/tensorflow/tensorflow.git
 cd %PROJECT_ROOT%\tensorflow
 git checkout r1.9 
+
+REM Set compiler environment
+cd "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build"
+call vcvarsall.bat amd64
 
 REM Build tensorflow static libraries
 echo Generating tensorflow project files...
