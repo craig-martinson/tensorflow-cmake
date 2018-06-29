@@ -10,7 +10,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	call :installcmake
 )
 
- REM Clone tensorflow repository
+REM Clone tensorflow repository
 echo Cloning tensorflow project...
 git clone https://github.com/tensorflow/tensorflow.git
 cd %PROJECT_ROOT%\tensorflow
@@ -26,7 +26,7 @@ cd %PROJECT_ROOT%\tensorflow\tensorflow\contrib\cmake
 IF EXIST build rd /S /Q build
 mkdir build
 cd build
-cmake -Dtensorflow_BUILD_ALL_KERNELS=OFF -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF -Dtensorflow_ENABLE_GRPC_SUPPORT==OFF -Dtensorflow_BUILD_CC_EXAMPLE=OFF -Dtensorflow_WIN_CPU_SIMD_OPTIONS=ON -G%VISUAL_STUDIO_VERSION% ..
+cmake -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF -Dtensorflow_ENABLE_GRPC_SUPPORT==OFF -Dtensorflow_BUILD_CC_EXAMPLE=OFF -Dtensorflow_WIN_CPU_SIMD_OPTIONS=/arch:AVX2 -G%VISUAL_STUDIO_VERSION% ..
 msbuild.exe tensorflow.sln /t:Build /p:Configuration=Release;Platform=x64
 
 REM Build solution
@@ -41,8 +41,6 @@ msbuild TENSORFLOWTEST.sln /p:Configuration=Release
 REM All done
 echo All done - SUCCESS
 goto :eof
-
-REM Helper functions
 
 REM Install CMake helper
 :installcmake

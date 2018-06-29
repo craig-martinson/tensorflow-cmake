@@ -30,7 +30,7 @@ link_directories(${TENSORFLOW_BUILD_DIR})
 target_link_libraries(TENSORFLOWTEST 
 	${TENSORFLOW_BUILD_DIR}/zlib/install/lib/zlibstatic.lib
 	${TENSORFLOW_BUILD_DIR}/gif/install/lib/giflib.lib
-	${TENSORFLOW_BUILD_DIR}/png/install/lib/libpng12_static.lib
+	${TENSORFLOW_BUILD_DIR}/png/install/lib/libpng16_static.lib
 	${TENSORFLOW_BUILD_DIR}/lmdb/install/lib/lmdb.lib
 	${TENSORFLOW_BUILD_DIR}/jsoncpp/src/jsoncpp/src/lib_json/$(Configuration)/jsoncpp.lib
 	${TENSORFLOW_BUILD_DIR}/farmhash/install/lib/farmhash.lib
@@ -55,18 +55,20 @@ target_link_libraries(TENSORFLOWTEST
 	${TENSORFLOW_BUILD_DIR}/snappy/src/snappy/$(Configuration)/snappy.lib
 	${TENSORFLOW_BUILD_DIR}/sqlite/src/sqlite-build/$(Configuration)/sqlite.lib
 	${TENSORFLOW_BUILD_DIR}/tf_cc_while_loop.dir/$(Configuration)/tf_cc_while_loop.lib
+
+	${TENSORFLOW_BUILD_DIR}/double_conversion/src/double_conversion/double-conversion/$(Configuration)/double-conversion.lib
 )
 
 set_target_properties(TENSORFLOWTEST PROPERTIES LINK_FLAGS 
 	"/ignore:4217 /ignore:4049
 	/WHOLEARCHIVE:tf_cc.lib 
-	/WHOLEARCHIVE:tf_cc_framework.lib
-	/WHOLEARCHIVE:tf_cc_ops.lib 
 	/WHOLEARCHIVE:tf_core_cpu.lib
-	/WHOLEARCHIVE:tf_core_direct_session.lib 
 	/WHOLEARCHIVE:tf_core_framework.lib
-	/WHOLEARCHIVE:tf_core_lib.lib
+	/WHOLEARCHIVE:tf_core_kernels.lib
+	/WHOLEARCHIVE:tf_cc_framework.lib
+	/WHOLEARCHIVE:tf_cc_ops.lib 	
 	/WHOLEARCHIVE:tf_core_ops.lib 
-	/WHOLEARCHIVE:libjpeg.lib 
-	/WHOLEARCHIVE:tf_core_kernels.lib"
+	/WHOLEARCHIVE:tf_core_direct_session.lib
+	/WHOLEARCHIVE:tf_core_lib.lib
+	/WHOLEARCHIVE:libjpeg.lib"
 )
