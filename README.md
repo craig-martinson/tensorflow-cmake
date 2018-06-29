@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Example of compiling and linking tensorflow as a static library to a Windows c++ program using cmake
+Example of building and linking tensorflow as a static library to a Windows c++ program using cmake
 
 ## Prerequisites
 
