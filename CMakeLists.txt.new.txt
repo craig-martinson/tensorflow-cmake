@@ -1,15 +1,27 @@
 cmake_minimum_required (VERSION 3.8.1)
 project (TENSORFLOWTEST)
 
+# Example:
+# cmake -Dtensorflow_BUILD_ALL_KERNELS=OFF -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF -Dtensorflow_ENABLE_GRPC_SUPPORT==OFF -Dtensorflow_BUILD_CC_EXAMPLE=OFF -G"Visual Studio 15 2017 Win64" ..
+# msbuild.exe tensorflow.sln /t:Build /p:Configuration=Release;Platform=x64
+# msbuild.exe tensorflowtest.sln /t:Build /p:Configuration=Release;Platform=x64
+
+# enable visual studio projects
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(TENSORFLOW_SOURCE_DIR tensorflow)
-set(TENSORFLOW_BUILD_DIR ${TENSORFLOWTEST_SOURCE_DIR}/tensorflow/tensorflow/contrib/cmake/build)
+set(TENSORFLOW_BUILD_DIR ${TENSORFLOWTEST_SOURCE_DIR}/tensorflow/tensorflow/contrib/cmake/build3)
+
+# add the tensorflow libs, must build in contrib/cmake folder due to hardcoded include paths
+#add_subdirectory(tensorflow/tensorflow/contrib/cmake ${TENSORFLOW_BUILD_DIR})
 
 include_directories(
-	${TENSORFLOW_SOURCE_DIR}
-	${TENSORFLOW_SOURCE_DIR}/tensorflow/contrib/cmake/build
-	${TENSORFLOW_SOURCE_DIR}/tensorflow/contrib/cmake/build/external/eigen_archive
+	${TENSORFLOWTEST_SOURCE_DIR}
+	${TENSORFLOW_BUILD_DIR}
+	${TENSORFLOW_BUILD_DIR}/external/eigen_archive
+	${TENSORFLOW_BUILD_DIR}/protobuf/src/protobuf/src
 	${TENSORFLOW_SOURCE_DIR}/third_party/eigen3
-	${TENSORFLOW_SOURCE_DIR}/tensorflow/contrib/cmake/build/protobuf/src/protobuf/src
+	${TENSORFLOWTEST_SOURCE_DIR}/build/tensorflow/tensorflow/contrib/cmake/gif/src/gif/lib
 )
 
 # Suppress compiler warnings
@@ -24,6 +36,18 @@ set(TENSORFLOWTEST_HDRS
 )
 
 add_executable(TENSORFLOWTEST ${TENSORFLOWTEST_SRCS} ${TENSORFLOWTEST_HDRS})
+
+add_dependencies(TENSORFLOWTEST 
+	tf_core_lib
+	tf_core_cpu
+	tf_core_framework
+	tf_core_kernels
+	tf_cc_framework
+	tf_cc_ops 
+	tf_core_ops 
+	tf_core_direct_session 
+	tf_cc 
+)
 
 link_directories(${TENSORFLOW_BUILD_DIR})
 
@@ -59,14 +83,35 @@ target_link_libraries(TENSORFLOWTEST
 
 set_target_properties(TENSORFLOWTEST PROPERTIES LINK_FLAGS 
 	"/ignore:4217 /ignore:4049
-	/WHOLEARCHIVE:tf_cc.lib 
+	/WHOLEARCHIVE:tf_core_lib.lib
+	/WHOLEARCHIVE:tf_core_cpu.lib
+	/WHOLEARCHIVE:tf_core_framework.lib
+	/WHOLEARCHIVE:tf_core_kernels.lib
 	/WHOLEARCHIVE:tf_cc_framework.lib
 	/WHOLEARCHIVE:tf_cc_ops.lib 
-	/WHOLEARCHIVE:tf_core_cpu.lib
-	/WHOLEARCHIVE:tf_core_direct_session.lib 
-	/WHOLEARCHIVE:tf_core_framework.lib
-	/WHOLEARCHIVE:tf_core_lib.lib
 	/WHOLEARCHIVE:tf_core_ops.lib 
-	/WHOLEARCHIVE:libjpeg.lib 
-	/WHOLEARCHIVE:tf_core_kernels.lib"
+	/WHOLEARCHIVE:tf_core_direct_session.lib 
+	/WHOLEARCHIVE:tf_cc.lib 
+	/WHOLEARCHIVE:libjpeg.lib"
 )
+
+# refer http://fabic.net/notes/2017/12/22/cmake-random-notes/
+get_property(subdirs_list
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  PROPERTY SUBDIRECTORIES)
+
+foreach(subdir ${subdirs_list})
+	get_property(_targets_list DIRECTORY "${subdir}" PROPERTY BUILDSYSTEM_TARGETS )
+
+	if (NOT _targets_list)
+		message(STATUS "FYI: ${subdir}: Provided no build target.")
+	else()
+		foreach(_target ${_targets_list})
+			# setup visual studio folders
+			set_target_properties(${_target} PROPERTIES FOLDER Tensorflow)
+			endforeach()
+	endif()
+	  
+endforeach()
+
+
