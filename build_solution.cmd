@@ -27,7 +27,7 @@ IF EXIST build rd /S /Q build
 mkdir build
 cd build
 cmake -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF -Dtensorflow_ENABLE_GRPC_SUPPORT==OFF -Dtensorflow_BUILD_CC_EXAMPLE=OFF -Dtensorflow_WIN_CPU_SIMD_OPTIONS=/arch:AVX2 -G%VISUAL_STUDIO_VERSION% ..
-msbuild.exe tensorflow.sln /t:Build /p:Configuration=Release;Platform=x64
+msbuild.exe tensorflow.sln /t:Build /p:Configuration=Release;Platform=x64 /m
 
 REM Build solution
 echo Building solution...
@@ -36,7 +36,7 @@ IF EXIST build rd /S /Q build
 mkdir build
 cd build
 cmake -G%VISUAL_STUDIO_VERSION% ..
-msbuild TENSORFLOWTEST.sln /p:Configuration=Release
+msbuild TENSORFLOWTEST.sln /p:Configuration=Release /m
 
 REM All done
 echo All done - SUCCESS
@@ -50,7 +50,6 @@ goto :eof
 
 :downloadcmake
 echo CMake was not found, so we are installing it for you... 
-REM %PROJECT_ROOT%\tools\httpget "https://cmake.org/files/v3.10/cmake-3.10.0-win64-x64.zip"
 powershell -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://cmake.org/files/v3.10/cmake-3.10.0-win64-x64.zip -OutFile cmake-3.10.0-win64-x64.zip }"
 if ERRORLEVEL 1 goto :cmakefailed
 echo Decompressing cmake-3.10.0-win64-x64.zip...
